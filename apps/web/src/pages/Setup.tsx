@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import styles from "./Setup.module.css";
-import { Chip, Header, PrimaryButton, Screen } from "@/components/Primitives";
+import { Header, PrimaryButton, Screen } from "@/components/Primitives";
 import { generateQuestions } from "@/api/gabai";
 import { useSession } from "@/state/session";
+import { exerciseTypeSchema } from "@gabai/shared";
+
+const allTypes = exerciseTypeSchema.options;
 
 export function SetupPage() {
   const navigate = useNavigate();
@@ -40,17 +43,30 @@ export function SetupPage() {
       }
     >
       <Header title="Ihanda ang review" onBack={() => navigate(-1)} />
-      <span className={`t-caption ${styles.label}`}>Selected types</span>
+      <span className={`t-caption ${styles.label}`}>Question types</span>
       {!sourceId ? <p className={styles.empty}>Choose a source before starting a review.</p> : null}
       {disabled && sourceId && !loading ? <p className={styles.empty}>Pick at least one question type to continue.</p> : null}
       <div className={styles.chips}>
-        {selectedTypes.map((typeName) => (
-          <Chip
-            key={typeName}
-            label={typeName.replace(/_/g, " ")}
-            onRemove={() => setSelectedTypes(selectedTypes.filter((item) => item !== typeName))}
-          />
-        ))}
+        {allTypes.map((typeName) => {
+          const selected = selectedTypes.includes(typeName);
+          return (
+            <button
+              key={typeName}
+              type="button"
+              aria-pressed={selected}
+              className={`${styles.typeChip}${selected ? ` ${styles.typeChipSelected}` : ""}`}
+              onClick={() =>
+                setSelectedTypes(
+                  selected
+                    ? selectedTypes.filter((item) => item !== typeName)
+                    : [...selectedTypes, typeName],
+                )
+              }
+            >
+              {typeName.replace(/_/g, " ")}
+            </button>
+          );
+        })}
       </div>
       <span className={`t-caption ${styles.label}`}>Question count</span>
       <div className={styles.segment}>
