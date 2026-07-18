@@ -3,10 +3,17 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
+// getUserMedia (mic) works on plain http://localhost, but any other origin
+// (e.g. opening the dev server from a phone via LAN IP) requires HTTPS.
+// Set DEV_HTTPS=1 to enable the self-signed certificate for LAN testing.
+const useHttps = Boolean(process.env.DEV_HTTPS);
+
+// Defaults to the local API server; set VITE_PROXY_TARGET to point elsewhere
+// (e.g. https://buildathon-2026.onrender.com for the deployed API).
+const proxyTarget = process.env.VITE_PROXY_TARGET ?? "http://localhost:4000";
+
 export default defineConfig({
-  // HTTPS is required for getUserMedia (mic) on any origin other than localhost,
-  // e.g. when opening the dev server from a phone via LAN IP.
-  plugins: [react(), basicSsl()],
+  plugins: [react(), ...(useHttps ? [basicSsl()] : [])],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -16,8 +23,8 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      "/api": "https://buildathon-2026.onrender.com/",
-      "/health": "https://buildathon-2026.onrender.com/",
+      "/api": proxyTarget,
+      "/health": proxyTarget,
     },
   },
 });

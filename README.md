@@ -70,7 +70,12 @@ npm run dev:server   # Express API on http://localhost:4000
 npm run dev:web      # Vite dev server on http://localhost:5173
 ```
 
-Open http://localhost:5173. The Vite dev server proxies `/api` and `/health` to the API server, so no frontend env vars are needed in development. For a production build pointing at a remote API, set `VITE_API_BASE_URL`.
+Open http://localhost:5173. The Vite dev server proxies `/api` and `/health` to the local API server, so no frontend env vars are needed in development. For a production build pointing at a remote API, set `VITE_API_BASE_URL`.
+
+Optional dev flags:
+
+- `VITE_PROXY_TARGET` — proxy to a different API (e.g. `https://buildathon-2026.onrender.com`) instead of `http://localhost:4000`.
+- `DEV_HTTPS=1` — serve the dev app over HTTPS with a self-signed certificate. Needed for mic access when opening the app from another device via LAN IP (browsers only allow `getUserMedia` on HTTPS or localhost).
 
 Sanity check the API:
 
